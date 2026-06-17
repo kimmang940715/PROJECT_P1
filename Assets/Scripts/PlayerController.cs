@@ -1,5 +1,8 @@
 using UnityEngine;
 
+// 이 스크립트를 오브젝트에 붙이면 Rigidbody2D와 BoxCollider2D가 없을 때 자동으로 생성됩니다.
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(BoxCollider2D))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
@@ -12,13 +15,13 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        // 컴포넌트 캐싱 (성능 최적화)
+        // RequireComponent 덕분에 이제 무조건 존재함이 보장되므로 안심하고 캐싱할 수 있습니다.
         rb = GetComponent<Rigidbody2D>();
     }
 
     private void Update()
     {
-        // 1. 유저 입력 받기 (매 프레임 체크하는 Update가 적합)
+        // 1. 유저 입력 받기
         horizontalInput = Input.GetAxisRaw("Horizontal");
 
         // 2. 점프 입력 처리
@@ -30,23 +33,21 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // 3. 물리적인 이동 처리 (물리 연산은 FixedUpdate에서 수행)
+        // 3. 물리적인 이동 처리
         Move();
     }
 
     private void Move()
     {
-        // Unity 6 권장: velocity 대신 linearVelocity 사용
         rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
     }
 
     private void Jump()
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-        isGrounded = false; // 점프하는 순간 공중에 뜸
+        isGrounded = false;
     }
 
-    // 바닥에 착지했는지 확인하는 충돌 콜백
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
