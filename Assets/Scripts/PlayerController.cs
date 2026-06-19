@@ -13,6 +13,35 @@ public class PlayerController : MonoBehaviour
     private float horizontalInput;
     private bool isGrounded;
 
+    [Header("Player Stats")]
+    public int maxHp = 3;
+    private int currentHp;
+
+    private void Start() // Awake 말고 Start에 작성
+    {
+        currentHp = maxHp; // 시작할 때 체력 꽉 채우기
+    }
+
+    // 유성이 호출할 데미지 처리 함수
+    public void TakeDamage(int damage)
+    {
+        currentHp -= damage;
+        Debug.Log($"으악! 유성에 맞았다! 남은 HP: {currentHp}");
+
+        if (currentHp <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        Debug.Log("💀 플레이어 사망... 게임 오버!");
+        GameManager.Instance.isGameOver = true;
+
+        // 플레이어 조작 불가능하게 비활성화 하거나 파괴
+        gameObject.SetActive(false);
+    }
     private void Awake()
     {
         // RequireComponent 덕분에 이제 무조건 존재함이 보장되므로 안심하고 캐싱할 수 있습니다.
