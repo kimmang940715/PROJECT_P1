@@ -17,6 +17,19 @@ public class PlayerController : MonoBehaviour
     public int maxHp = 3;
     private int currentHp;
 
+    private void Awake()
+    {
+        // RequireComponent 덕분에 이제 무조건 존재함이 보장되므로 안심하고 캐싱할 수 있습니다.
+        rb = GetComponent<Rigidbody2D>();
+
+        // [추가된 코드] 플레이어가 빠른 속도로 떨어질 때 바닥을 뚫는 현상(터널링)을 방지합니다.
+        // 물리 엔진이 프레임 사이의 이동 경로까지 연속(Continuous)적으로 추적하여 충돌을 감지하게 합니다.
+        if (rb != null)
+        {
+            rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        }
+    }
+
     private void Start() // Awake 말고 Start에 작성
     {
         currentHp = maxHp; // 시작할 때 체력 꽉 채우기
@@ -37,15 +50,15 @@ public class PlayerController : MonoBehaviour
     private void Die()
     {
         Debug.Log("💀 플레이어 사망... 게임 오버!");
-        GameManager.Instance.isGameOver = true;
+
+        // 싱글톤 호출 전 안전장치 추가
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.isGameOver = true;
+        }
 
         // 플레이어 조작 불가능하게 비활성화 하거나 파괴
         gameObject.SetActive(false);
-    }
-    private void Awake()
-    {
-        // RequireComponent 덕분에 이제 무조건 존재함이 보장되므로 안심하고 캐싱할 수 있습니다.
-        rb = GetComponent<Rigidbody2D>();
     }
 
     private void Update()
